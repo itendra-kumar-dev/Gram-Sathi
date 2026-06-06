@@ -1,53 +1,52 @@
-const express =
-require("express");
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("./config/db");
 
-const dotenv =
-require("dotenv");
-
-const cors =
-require("cors");
-
-const connectDB =
-require("./config/db");
-
+// Load environment variables
 dotenv.config();
 
+// Connect MongoDB
 connectDB();
 
 const app = express();
 
+// Middlewares
 app.use(cors());
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Routes
 app.use(
   "/api/auth",
-  require(
-    "./routes/authRoutes"
-  )
+  require("./routes/authRoutes")
 );
 
-app.get(
-  "/",
-  (req, res) => {
-
-    res.send(
-      "GramSathi API Running"
-    );
-
-  }
+app.use(
+  "/api/equipments",
+  require("./routes/equipmentRoutes")
 );
 
-const PORT =
-process.env.PORT || 5000;
+// Test Route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "GramSathi API Running 🚜",
+  });
+});
 
-app.listen(
-  PORT,
-  () => {
+// 404 Route Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found",
+  });
+});
+// Start Server
+const PORT = process.env.PORT || 5000;
 
-    console.log(
-      `Server Running on ${PORT}`
-    );
-
-  }
-);
+app.listen(PORT, () => {
+  console.log(
+    `🚀 Server running on port ${PORT}`
+  );
+});

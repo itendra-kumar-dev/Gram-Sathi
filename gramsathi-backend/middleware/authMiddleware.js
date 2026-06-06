@@ -1,6 +1,9 @@
 const jwt =
 require("jsonwebtoken");
 
+const User =
+require("../models/User");
+
 const protect =
 async (
   req,
@@ -30,7 +33,10 @@ async (
           process.env.JWT_SECRET
         );
 
-      req.user = decoded;
+      req.user =
+        await User.findById(
+          decoded.id
+        ).select("-password");
 
       next();
 
@@ -38,7 +44,7 @@ async (
 
       return res.status(401).json({
         message:
-          "Invalid Token"
+          "Invalid Token",
       });
 
     }
@@ -48,12 +54,12 @@ async (
 
     return res.status(401).json({
       message:
-        "No Token"
+        "No Token",
     });
 
   }
 };
 
 module.exports = {
-  protect
+  protect,
 };
