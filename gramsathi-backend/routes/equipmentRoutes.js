@@ -1,8 +1,6 @@
-const express =
-require("express");
+const express = require("express");
 
-const router =
-express.Router();
+const router = express.Router();
 
 const {
   addEquipment,
@@ -26,6 +24,12 @@ const {
   "../middleware/roleMiddleware"
 );
 
+const upload = require(
+  "../middleware/uploadMiddleware"
+);
+
+// Public Routes
+
 router.get(
   "/",
   getEquipments
@@ -36,10 +40,13 @@ router.get(
   getEquipmentById
 );
 
+// Seller Routes
+
 router.post(
   "/",
   protect,
   sellerOnly,
+  upload.single("image"),
   addEquipment
 );
 
@@ -47,6 +54,7 @@ router.put(
   "/:id",
   protect,
   sellerOnly,
+  upload.single("image"),
   updateEquipment
 );
 
@@ -57,5 +65,4 @@ router.delete(
   deleteEquipment
 );
 
-module.exports =
-router;
+module.exports = router;
