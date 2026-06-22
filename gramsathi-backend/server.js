@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 
 dotenv.config();
 
+// Debug Logs
 console.log(
   "Cloud Name:",
   process.env.CLOUDINARY_CLOUD_NAME
@@ -21,10 +22,12 @@ console.log(
   !!process.env.CLOUDINARY_API_SECRET
 );
 
+// Connect Database
 connectDB();
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 
 app.use(express.json());
@@ -62,18 +65,21 @@ app.use(
   require("./routes/reviewRoutes")
 );
 
-// Home Route
+// Gemini AI Route
+app.use(
+  "/api/ai",
+  require("./routes/aiRoutes")
+);
 
+// Home Route
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message:
-      "GramSathi API Running 🚜",
+    message: "GramSathi API Running 🚜",
   });
 });
 
 // 404 Route
-
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -82,7 +88,6 @@ app.use((req, res) => {
 });
 
 // Global Error Handler
-
 app.use((err, req, res, next) => {
   console.log("GLOBAL ERROR:");
   console.log(err);
@@ -96,7 +101,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-
 const PORT =
   process.env.PORT || 8000;
 
