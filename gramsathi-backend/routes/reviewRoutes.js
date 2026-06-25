@@ -1,38 +1,32 @@
-const express =
-require("express");
+const express = require("express");
 
-const router =
-express.Router();
+const router = express.Router();
 
 const {
   addReview,
   getReviews,
-} = require(
-  "../controllers/reviewController"
-);
+  deleteReview,
+} = require("../controllers/reviewController");
 
 const {
   protect,
-} = require(
-  "../middleware/authMiddleware"
-);
-
-const {
-  clientOnly,
-} = require(
-  "../middleware/roleMiddleware"
-);
+} = require("../middleware/authMiddleware");
 
 router.post(
   "/",
   protect,
-  clientOnly,
   addReview
 );
 
 router.get(
   "/:id",
   getReviews
+);
+
+router.delete(
+  "/:id",
+  protect,
+  deleteReview
 );
 
 module.exports = router;

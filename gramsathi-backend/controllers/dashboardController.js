@@ -1,79 +1,67 @@
 const Equipment = require("../models/Equipment");
 const Booking = require("../models/Booking");
 
-const sellerDashboard = async (req, res) => {
+const getDashboard = async (req, res) => {
   try {
-    const sellerId = req.user._id;
 
-    const totalEquipments =
-      await Equipment.countDocuments({
-        sellerId,
-      });
-
-    const totalBookings =
-      await Booking.countDocuments({
-        sellerId,
-      });
-
-    const approvedBookings =
-      await Booking.countDocuments({
-        sellerId,
-        status: "approved",
-      });
-
-    const pendingBookings =
-      await Booking.countDocuments({
-        sellerId,
-        status: "pending",
-      });
-
-    res.status(200).json({
-      totalEquipments,
-      totalBookings,
-      approvedBookings,
-      pendingBookings,
+    const totalEquipment = await Equipment.countDocuments({
+      owner: req.user.id,
     });
+
+    const totalBookings = await Booking.countDocuments({
+      renter: req.user.id,
+    });
+
+    const bookingRequests = await Booking.countDocuments({
+      owner: req.user.id,
+      status: "Pending",
+    });
+
+    const activeRentals = await Booking.countDocuments({
+      owner: req.user.id,
+      status: "Approved",
+    });
+
+    const revenueData = await Booking.find({
+      owner: req.user.id,
+      status: "Completed",
+    });
+
+    const totalRevenue = revenueData.reduce(
+      (sum, item) => sum + item.totalAmount,
+      0
+    );
+
+    const recentBookings = await Booking.find({
+      owner: req.user.id,
+    })
+      .populate("equipment", "title")
+      .populate("renter", "name")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      dashboard: {
+        totalEquipment,
+        totalBookings,
+        bookingRequests,
+        activeRentals,
+        totalRevenue,
+        recentBookings,
+      },
+    });
+
   } catch (error) {
+
     res.status(500).json({
+      success: false,
       message: error.message,
     });
-  }
-};
 
-const clientDashboard = async (req, res) => {
-  try {
-    const clientId = req.user._id;
-
-    const totalBookings =
-      await Booking.countDocuments({
-        clientId,
-      });
-
-    const approvedBookings =
-      await Booking.countDocuments({
-        clientId,
-        status: "approved",
-      });
-
-    const pendingBookings =
-      await Booking.countDocuments({
-        clientId,
-        status: "pending",
-      });
-
-    res.status(200).json({
-      totalBookings,
-      approvedBookings,
-      pendingBookings,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
   }
 };
 
 module.exports = {
-  sellerDashboard,
-  clientDashboard,
+  getDashboard,
 };

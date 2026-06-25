@@ -8,61 +8,67 @@ const {
   getEquipmentById,
   updateEquipment,
   deleteEquipment,
-} = require(
-  "../controllers/equipmentController"
-);
+  myListings,
+  toggleAvailability,
+  getRelatedEquipments,
+} = require("../controllers/equipmentController");
 
-const {
-  protect,
-} = require(
-  "../middleware/authMiddleware"
-);
+const { protect } = require("../middleware/authMiddleware");
 
-const {
-  sellerOnly,
-} = require(
-  "../middleware/roleMiddleware"
-);
+const upload = require("../middleware/uploadMiddleware");
 
-const upload = require(
-  "../middleware/uploadMiddleware"
-);
-
+// ======================================
 // Public Routes
+// ======================================
 
-router.get(
-  "/",
-  getEquipments
-);
+// Get All Equipments
+router.get("/", getEquipments);
 
-router.get(
-  "/:id",
-  getEquipmentById
-);
+// Get Single Equipment
+router.get("/:id", getEquipmentById);
 
-// Seller Routes
+// Get Related Equipments
+router.get("/related/:id", getRelatedEquipments);
 
+// ======================================
+// Protected Routes
+// ======================================
+
+// Add Equipment
 router.post(
   "/",
   protect,
-  sellerOnly,
-  upload.single("image"),
+  upload.array("images", 5),
   addEquipment
 );
 
+// Update Equipment
 router.put(
   "/:id",
   protect,
-  sellerOnly,
-  upload.single("image"),
+  upload.array("images", 5),
   updateEquipment
 );
 
+// Delete Equipment
 router.delete(
   "/:id",
   protect,
-  sellerOnly,
   deleteEquipment
+);
+
+// My Listings
+router.get(
+  "/my-listings",
+  protect,
+  myListings
+);
+
+// Toggle Availability
+router.put(
+  "/toggle/:id",
+  protect,
+  toggleAvailability
 );
 
 module.exports = router;

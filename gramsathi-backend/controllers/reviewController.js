@@ -1,14 +1,9 @@
-const Review =
-require("../models/Review");
-
-const Equipment =
-require("../models/Equipment");
-
+const Review = require("../models/Review");
+const Equipment = require("../models/Equipment");
 
 // Add Review
 
-const addReview =
-async (req, res) => {
+const addReview = async (req, res) => {
 
   try {
 
@@ -18,101 +13,137 @@ async (req, res) => {
       comment,
     } = req.body;
 
-    const existingReview =
-      await Review.findOne({
-        equipmentId,
-        clientId:
-          req.user._id,
-      });
+    const review = await Review.create({
 
-    if (existingReview) {
+      equipment: equipmentId,
 
-      return res.status(400).json({
-        message:
-          "You already reviewed this equipment",
-      });
+      user: req.user.id,
 
-    }
+      rating,
 
-    const review =
-      await Review.create({
-        equipmentId,
-        clientId:
-          req.user._id,
-        rating,
-        comment,
-      });
+      comment,
 
-    const reviews =
-      await Review.find({
-        equipmentId,
-      });
+    });
 
-    const totalRatings =
+    const reviews = await Review.find({
+      equipment: equipmentId,
+    });
+
+    const average =
       reviews.reduce(
-        (sum, item) =>
-          sum + item.rating,
+        (sum, item) => sum + item.rating,
         0
-      );
-
-    const averageRating =
-      totalRatings /
-      reviews.length;
+      ) / reviews.length;
 
     await Equipment.findByIdAndUpdate(
       equipmentId,
       {
-        averageRating,
-        totalReviews:
-          reviews.length,
+        rating: average,
+        reviews: reviews.length,
       }
     );
 
-    res.status(201).json(
-      review
-    );
+    res.status(201).json({
+      success: true,
+      review,
+    });
 
   } catch (error) {
 
     res.status(500).json({
-      message:
-        error.message,
+      success: false,
+      message: error.message,
     });
 
   }
-};
 
+};
 
 // Get Reviews
 
-const getReviews =
-async (req, res) => {
+const getReviews = async (req, res) => {
 
   try {
 
-    const reviews =
-      await Review.find({
-        equipmentId:
-          req.params.id,
-      })
-      .populate(
-        "clientId",
-        "name"
-      );
+    const reviews = await Review.find({
+      equipment: req.params.id,
+    }).populate(
+      "user",
+      "name"
+    );
 
-    res.json(reviews);
+    res.json({
+      success: true,
+      reviews,
+    });
 
   } catch (error) {
 
     res.status(500).json({
-      message:
-        error.message,
+      success: false,
+      message: error.message,
     });
 
   }
+
+};
+
+// Delete Review
+
+const deleteReview = async (req, res) => {
+
+  try {
+
+    const review =
+      await Review.findById(
+        req.params.id
+      );
+
+    if (!review) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+
+    }
+
+    if (
+      review.user.toString() !==
+      req.user.id
+    ) {
+
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+
+    }
+
+    await review.deleteOne();
+
+    res.json({
+      success: true,
+      message: "Review deleted",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+
 };
 
 module.exports = {
+
   addReview,
+
   getReviews,
+
+  deleteReview,
+
 };

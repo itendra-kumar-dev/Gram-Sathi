@@ -17,30 +17,88 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    rentPrice: {
+    brand: {
+      type: String,
+    },
+
+    pricePerDay: {
       type: Number,
       required: true,
     },
 
-    image: {
-      type: String,
-      default: "",
+    securityDeposit: {
+      type: Number,
+      default: 0,
     },
 
-    sellerId: {
+    location: {
+      type: String,
+      required: true,
+    },
+
+    district: {
+      type: String,
+    },
+
+    state: {
+      type: String,
+    },
+
+    availableFrom: {
+      type: Date,
+      required: true,
+    },
+
+    availableTo: {
+      type: Date,
+      required: true,
+    },
+
+    availableTimeStart: {
+      type: String,
+    },
+
+    availableTimeEnd: {
+      type: String,
+    },
+
+    images: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        public_id: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    averageRating: {
+    rating: {
       type: Number,
       default: 0,
     },
 
-    totalReviews: {
+    reviews: {
       type: Number,
       default: 0,
+    },
+
+    isAvailable: {
+      type: Boolean,
+      default: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -48,8 +106,4 @@ const equipmentSchema = new mongoose.Schema(
   }
 );
 
-module.exports =
-mongoose.model(
-  "Equipment",
-  equipmentSchema
-);
+module.exports = mongoose.model("Equipment", equipmentSchema);

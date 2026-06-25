@@ -1,71 +1,72 @@
-const express =
-require("express");
+const express = require("express");
 
-const router =
-express.Router();
+const router = express.Router();
 
 const {
   createBooking,
-  getMyBookings,
-  getSellerBookings,
   approveBooking,
   rejectBooking,
-} = require(
-  "../controllers/bookingController"
-);
+  cancelBooking,
+  completeBooking,
+  myBookings,
+  bookingRequests,
+} = require("../controllers/bookingController");
 
 const {
   protect,
-} = require(
-  "../middleware/authMiddleware"
-);
+} = require("../middleware/authMiddleware");
 
-const {
-  sellerOnly,
-  clientOnly,
-} = require(
-  "../middleware/roleMiddleware"
-);
+// ==========================
+// Booking Routes
+// ==========================
 
-
-// Client Routes
-
+// Create Booking
 router.post(
-  "/",
+  "/book",
   protect,
-  clientOnly,
   createBooking
 );
 
+// My Bookings
 router.get(
-  "/my",
+  "/my-bookings",
   protect,
-  clientOnly,
-  getMyBookings
+  myBookings
 );
 
-
-// Seller Routes
-
+// Booking Requests (Owner)
 router.get(
-  "/seller",
+  "/requests",
   protect,
-  sellerOnly,
-  getSellerBookings
+  bookingRequests
 );
 
+// Approve Booking
 router.put(
-  "/:id/approve",
+  "/approve/:id",
   protect,
-  sellerOnly,
   approveBooking
 );
 
+// Reject Booking
 router.put(
-  "/:id/reject",
+  "/reject/:id",
   protect,
-  sellerOnly,
   rejectBooking
+);
+
+// Cancel Booking
+router.put(
+  "/cancel/:id",
+  protect,
+  cancelBooking
+);
+
+// Complete Booking
+router.put(
+  "/complete/:id",
+  protect,
+  completeBooking
 );
 
 module.exports = router;

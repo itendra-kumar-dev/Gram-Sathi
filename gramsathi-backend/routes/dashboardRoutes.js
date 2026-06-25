@@ -3,37 +3,17 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  sellerDashboard,
-  clientDashboard,
-} = require(
-  "../controllers/dashboardController"
-);
+  getDashboard,
+} = require("../controllers/dashboardController");
 
 const {
   protect,
-} = require(
-  "../middleware/authMiddleware"
-);
-
-const {
-  sellerOnly,
-  clientOnly,
-} = require(
-  "../middleware/roleMiddleware"
-);
+} = require("../middleware/authMiddleware");
 
 router.get(
-  "/seller",
+  "/",
   protect,
-  sellerOnly,
-  sellerDashboard
-);
-
-router.get(
-  "/client",
-  protect,
-  clientOnly,
-  clientDashboard
+  getDashboard
 );
 
 module.exports = router;
