@@ -1,18 +1,25 @@
-import Navbar from "../components/Navbar";
-import Hero from "../components/Hero";
-import Stats from "../components/Stats";
-import Features from "../components/Features";
-import Footer from "../components/Footer";
+import MainLayout from "../layouts/MainLayout";
+import Hero from "../components/home/Hero";
+import SearchFilter from "../components/home/SearchFilter";
+import CategoryNav from "../components/home/CategoryNav";
+import EquipmentGrid from "../components/home/EquipmentGrid";
+import WhyChoose from "../components/home/WhyChoose";
+import Testimonials from "../components/home/Testimonials";
+import DownloadApp from "../components/home/DownloadApp";
+
 
 function Home() {
   return (
-    <>
-      <Navbar />
+    <MainLayout>
       <Hero />
-      <Stats />
-      <Features />
-      <Footer />
-    </>
+      <SearchFilter />
+      <CategoryNav />
+      <EquipmentGrid />
+      <WhyChoose />
+      <Testimonials />
+       <DownloadApp />
+    
+    </MainLayout>
   );
 }
 
