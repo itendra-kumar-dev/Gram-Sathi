@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import AddEquipment from "./pages/AddEquipment";
 import MyListings from "./pages/MyListings";
 import EditEquipment from "./pages/EditEquipment";
+import Wishlist from "./pages/Wishlist";
 
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
@@ -28,6 +29,7 @@ function App() {
           path="/dashboard"
           element={<Dashboard />}
         />
+        <Route path="/wishlist" element={<Wishlist />} />
 
         <Route
           path="/add-equipment"

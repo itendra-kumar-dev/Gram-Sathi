@@ -1,4 +1,5 @@
-import { FaHeart, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import WishlistButton from "../common/WishlistButton";
 
 function EquipmentCard({ equipment }) {
   return (
@@ -14,9 +15,11 @@ function EquipmentCard({ equipment }) {
           className="w-full h-56 sm:h-60 object-cover group-hover:scale-105 transition duration-500"
         />
 
-        <button className="absolute top-4 right-4 bg-white p-3 rounded-full shadow-lg hover:bg-red-500 hover:text-white transition">
-          <FaHeart />
-        </button>
+        <WishlistButton
+          equipment={equipment}
+          wrapperClassName="absolute top-4 right-4"
+          className="rounded-full bg-white p-3 shadow-lg transition hover:bg-red-500 hover:text-white"
+        />
 
         <span
           className={`absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm font-semibold text-white ${

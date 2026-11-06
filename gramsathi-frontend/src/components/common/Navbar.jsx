@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 import ProfileDropdown from "./ProfileDropdown";
 
 import {
@@ -20,6 +21,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   const { user, logout, isAuthenticated } = useAuth();
+  const { items: wishlistItems } = useWishlist();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,10 +81,15 @@ function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-4 xl:gap-7 relative">
-            <button className="hidden xl:flex flex-col items-center text-sm hover:text-green-700 transition relative">
+            <Link to="/wishlist" className="hidden xl:flex flex-col items-center text-sm hover:text-green-700 transition relative">
               <FaHeart size={18} />
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white">
+                  {wishlistItems.length}
+                </span>
+              )}
               <span className="text-xs mt-1">Wishlist</span>
-            </button>
+            </Link>
 
             <button className="hidden xl:flex flex-col items-center text-sm hover:text-green-700 transition relative">
               <BiMessageRounded size={22} />
@@ -161,6 +168,11 @@ function Navbar() {
               <Link to="/search" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-gray-700">
                 Browse
               </Link>
+              {isAuthenticated && (
+                <Link to="/wishlist" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-gray-700">
+                  Wishlist ({wishlistItems.length})
+                </Link>
+              )}
               <Link to="/add-equipment" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-green-700">
                 Post Equipment
               </Link>

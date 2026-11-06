@@ -71,6 +71,11 @@ app.use(
   require("./routes/aiRoutes")
 );
 
+app.use(
+  "/api/wishlist",
+  require("./routes/wishlistRoutes")
+);
+
 // ============================
 // Home Route
 // ============================
