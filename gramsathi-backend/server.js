@@ -76,6 +76,11 @@ app.use(
   require("./routes/wishlistRoutes")
 );
 
+app.use(
+  "/api/notifications",
+  require("./routes/notificationRoutes")
+);
+
 // ============================
 // Home Route
 // ============================

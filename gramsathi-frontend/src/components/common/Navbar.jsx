@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { getNotifications } from "../../services/notificationApi";
 import ProfileDropdown from "./ProfileDropdown";
 
 import {
@@ -25,6 +26,33 @@ function Navbar() {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUnreadCount(0);
+      return undefined;
+    }
+
+    let active = true;
+    const loadUnreadCount = async () => {
+      try {
+        const data = await getNotifications();
+        if (active) setUnreadCount(data.unreadCount || 0);
+      } catch (error) {
+        if (active) console.error("Unable to refresh notification count:", error);
+      }
+    };
+
+    loadUnreadCount();
+    const intervalId = window.setInterval(loadUnreadCount, 30000);
+    window.addEventListener("notifications-updated", loadUnreadCount);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("notifications-updated", loadUnreadCount);
+    };
+  }, [isAuthenticated, user?._id, user?.id]);
 
   const handleLogout = () => {
     logout();
@@ -99,13 +127,15 @@ function Navbar() {
               <span className="text-xs mt-1">Messages</span>
             </button>
 
-            <button className="hidden xl:flex flex-col items-center text-sm hover:text-green-700 transition relative">
+            <Link to="/notifications" className="hidden xl:flex flex-col items-center text-sm hover:text-green-700 transition relative">
               <FaBell size={18} />
-              <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
-                5
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white">
+                  {unreadCount}
+                </span>
+              )}
               <span className="text-xs mt-1">Alerts</span>
-            </button>
+            </Link>
 
             <Link
               to="/add-equipment"
@@ -169,9 +199,14 @@ function Navbar() {
                 Browse
               </Link>
               {isAuthenticated && (
-                <Link to="/wishlist" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-gray-700">
-                  Wishlist ({wishlistItems.length})
-                </Link>
+                <>
+                  <Link to="/wishlist" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-gray-700">
+                    Wishlist ({wishlistItems.length})
+                  </Link>
+                  <Link to="/notifications" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-gray-700">
+                    Notifications ({unreadCount})
+                  </Link>
+                </>
               )}
               <Link to="/add-equipment" onClick={() => setIsMenuOpen(false)} className="text-sm font-semibold text-green-700">
                 Post Equipment

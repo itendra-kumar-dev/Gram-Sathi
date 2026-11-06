@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Equipment = require("../models/Equipment");
+const Notification = require("../models/Notification");
 const Wishlist = require("../models/Wishlist");
 
 const getWishlist = async (req, res) => {
@@ -29,14 +30,30 @@ const addToWishlist = async (req, res) => {
     }
 
     let wishlistItem = await Wishlist.findOne({ user: req.user.id, equipment: equipment._id });
+    let wasAdded = false;
 
     if (!wishlistItem) {
       try {
         wishlistItem = await Wishlist.create({ user: req.user.id, equipment: equipment._id });
+        wasAdded = true;
       } catch (error) {
         if (error.code !== 11000) throw error;
         wishlistItem = await Wishlist.findOne({ user: req.user.id, equipment: equipment._id });
       }
+    }
+
+    if (!wishlistItem) {
+      return res.status(409).json({ success: false, message: "Wishlist update conflicted. Please try again." });
+    }
+
+    if (wasAdded && String(equipment.owner) !== String(req.user.id)) {
+      await Notification.create({
+        recipient: equipment.owner,
+        type: "wishlist_added",
+        title: "Equipment added to a wishlist",
+        message: `Someone added ${equipment.title} to their wishlist.`,
+        link: "/my-listings",
+      });
     }
 
     await wishlistItem.populate("equipment");

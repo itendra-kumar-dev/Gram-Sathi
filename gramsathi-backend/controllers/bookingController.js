@@ -1,5 +1,6 @@
 const Booking = require("../models/Booking");
 const Equipment = require("../models/Equipment");
+const Notification = require("../models/Notification");
 
 // ===============================
 // Create Booking
@@ -128,6 +129,14 @@ const createBooking = async (req, res) => {
 
       });
 
+    await Notification.create({
+      recipient: equipment.owner,
+      type: "booking_request",
+      title: "New booking request",
+      message: `${req.user.name} requested to book ${equipment.title}.`,
+      link: "/dashboard",
+    });
+
     res.status(201).json({
 
       success: true,
@@ -180,6 +189,14 @@ const approveBooking = async (req, res) => {
 
     await booking.save();
 
+    await Notification.create({
+      recipient: booking.renter,
+      type: "booking_accepted",
+      title: "Booking approved",
+      message: "Your booking request was approved.",
+      link: "/dashboard",
+    });
+
     res.status(200).json({
       success: true,
       message: "Booking approved successfully.",
@@ -221,6 +238,14 @@ const rejectBooking = async (req, res) => {
     booking.status = "Rejected";
 
     await booking.save();
+
+    await Notification.create({
+      recipient: booking.renter,
+      type: "booking_rejected",
+      title: "Booking declined",
+      message: "Your booking request was declined.",
+      link: "/dashboard",
+    });
 
     res.status(200).json({
       success: true,
@@ -264,6 +289,14 @@ const cancelBooking = async (req, res) => {
     booking.status = "Cancelled";
 
     await booking.save();
+
+    await Notification.create({
+      recipient: booking.owner,
+      type: "booking_cancelled",
+      title: "Booking cancelled",
+      message: `${req.user.name} cancelled a booking request.`,
+      link: "/dashboard",
+    });
 
     res.status(200).json({
       success: true,
